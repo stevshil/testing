@@ -41,3 +41,19 @@ do
   # Set the test directory back to the default name
   mv spec/$host $coredir
 done
+```
+
+## Changing the output format
+
+Your serverspec tests **must** be ran using the following command in the directory that contains the **Rakefile**;
+```
+rake spec
+```
+
+This calls rspec under the scenes, so if you want to change the output of your tests you will need to edit the **.rspec** file and add your **rspec** options in to this file.
+
+The default **.rspec** file has;
+```
+--color
+--format documentation
+```
