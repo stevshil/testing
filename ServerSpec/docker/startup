@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# Script to start 3 containers
+# 1 Container will be the ServerSpec test server
+# 2 Containers will be tested against
+
+# Start the test machines
+docker run -itd --name testweb httpd
+docker run -itd --name testdb -e MYSQL_ROOT_PASSWORD=secret123 mysql:5.7.19
+docker run -itd --name serverspec --link testweb:testweb --link testdb:testdb -v tests:/opt/tests centos:8
+
+# Provision server
+docker exec serverspec bash -c "
+yum -y install https://mirrors.rpmfusion.org/free/el/rpmfusion-free-release-8.noarch.rpm https://mirrors.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-8.noarch.rpm
+yum -y install rubygems rubygem-bundler sudo
+useradd -m tester
+cat >/etc/sudoers.d/tester <<_EOF_
+tester ALL=(ALL)  NOPASSWD: ALL
+_EOF_
+sudo -u tester -i <<_X_
+gem install serverspec
+_X_
+"
+
+# Log on to ServerSpec system
+docker exec --user=tester -it serverspec bash
