@@ -22,8 +22,10 @@ describe service('mysql'), :if => os[:family] == 'ubuntu' do
   it { should be_running }
 end
 
-describe port(3306) do
-  it { should be_listening }
+for port in [22, 25, 80, 111, 3306]
+  describe port("#{port}") do
+    it { should be_listening }
+  end
 end
 
 describe port(22) do
